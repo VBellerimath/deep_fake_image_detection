@@ -1,0 +1,71 @@
+
+# ==================================
+# Python backend
+# ==================================
+
+venv/
+.venv/
+env/
+
+__pycache__/
+*.py[cod]
+*.pyo
+
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# ==================================
+# Downloaded model weights
+# ==================================
+
+models/smaug/
+
+# Training datasets and artifacts
+dataset/
+datasets/
+data/
+checkpoints/
+runs/
+
+# ==================================
+# React frontend
+# ==================================
+
+# Dependencies
+frontend/node_modules/
+
+# Build output
+frontend/dist/
+
+# Local environment files
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# Logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/pnpm-debug.log*
+
+# ==================================
+# IDE and operating system
+# ==================================
+
+.vscode/
+.idea/
+
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Python and frontend logs
+*.log
+
+# Jupyter
+.ipynb_checkpoints/

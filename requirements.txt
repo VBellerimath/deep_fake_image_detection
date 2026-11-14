@@ -1,0 +1,12 @@
+
+torch
+torchvision
+fastapi
+uvicorn[standard]
+python-multipart
+pillow
+sentence-transformers[image]
+huggingface_hub
+
+pytest
+httpx
