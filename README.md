@@ -1,98 +1,83 @@
+# 🔎 ImageGuard
 
-# Deep Fake Image Detection
+### Deepfake Image Detection
 
-AI-powered image classification application that predicts
-whether an uploaded image is REAL or AI-generated (FAKE).
-The application includes a React frontend and a FastAPI backend.
+Analyze an image with **Smaug** or **EfficientNet-B0** and get a REAL/FAKE
+prediction through a clean React interface and FastAPI backend.
 
-## Technology Stack
+| 🧠 Detection models | 🖥️ Frontend | ⚙️ Backend |
+|---|---|---|
+| Smaug + EfficientNet-B0 | React + Vite | FastAPI + PyTorch |
 
-- Python
-- PyTorch
-- EfficientNet-B0
-- FastAPI
-- Torchvision
-- Pillow
-- Uvicorn
-- React
-- Vite
+[Frontend guide](frontend/README.md) · [API docs](http://127.0.0.1:8000/docs)
 
-## Model Details
+---
 
-The API supports two models:
+## ✨ What it does
 
-- **EfficientNet-B0**: Custom-trained binary classifier. It resizes RGB
-  images to 224 x 224 and predicts REAL or FAKE. It was trained on CIFAKE.
-- **Smaug**: Pretrained image detector downloaded by the backend on first
-  startup and cached under `models/smaug/`.
+- Upload JPG or PNG images up to **10 MB**
+- Choose between two image detectors
+- View the prediction, confidence, and class scores
+- Check API health and explore endpoints with Swagger
 
-## Training Results
+## 🏗️ How it works
 
-The following metrics are for EfficientNet-B0:
-
-- Training accuracy: 99.88%
-- Validation accuracy: 98.87%
-- Validation loss: 0.0437
-
-These metrics are from the training and validation run.
-They do not establish performance on unseen generators.
-
-## Project Structure
-
-```text
-deep_fake_image_detection/
-├── app/
-│   ├── __init__.py
-│   ├── main.py
-│   ├── model_loader.py
-│   └── predict.py
-├── frontend/
-│   ├── src/
-│   ├── package.json
-│   └── README.md
-├── models/
-│   └── deepfake_model.pth
-├── tests/
-├── requirements.txt
-├── .gitignore
-└── README.md
+```mermaid
+flowchart LR
+    U[User] --> UI[React frontend]
+    UI -->|Image + selected model| API[FastAPI]
+    API --> V{Validate upload}
+    V -->|Smaug| S[Pretrained Smaug]
+    V -->|EfficientNet| E[EfficientNet-B0]
+    S --> R[Prediction + scores]
+    E --> R
+    R --> UI
 ```
 
-## Setup
+## 🤖 Models
 
-### 1. Create virtual environment
+| Model | Details | Notes |
+|---|---|---|
+| **Smaug** | Pretrained image detector | Default model; downloaded on first backend startup and cached in `models/smaug/`. |
+| **EfficientNet-B0** | Custom two-class model trained on CIFAKE | Resizes RGB images to 224 × 224; weights are expected at `models/deepfake_model.pth`. |
+
+### EfficientNet-B0 training results
+
+| Training accuracy | Validation accuracy | Validation loss |
+|:---:|:---:|:---:|
+| **99.88%** | **98.87%** | **0.0437** |
+
+These are results from the training and validation run; they do not establish
+performance on unseen generators.
+
+## 🚀 Quick start
+
+### 1. Set up and start the backend
+
+From the project root:
 
 ```bash
 python -m venv venv
 ```
 
-### 2. Activate environment
-
-Windows Command Prompt:
+Activate the environment and install dependencies:
 
 ```cmd
 venv\Scripts\activate.bat
-```
-
-### 3. Install dependencies
-
-```bash
 pip install -r requirements.txt
 ```
 
-## Run API
-
-From the project root, activate the virtual environment and start the API:
+Start the API:
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
-The first startup downloads the Smaug model if it is not already cached.
+> **First run:** The backend downloads Smaug if it is not already cached.
 
-## Run Frontend
+### 2. Start the frontend
 
-In a separate terminal:
+In a second terminal:
 
 ```bash
 cd frontend
@@ -100,28 +85,29 @@ npm install
 npm run dev
 ```
 
-Open the frontend URL printed by Vite (typically http://localhost:5173).
-The frontend connects to the API at http://127.0.0.1:8000.
+Vite opens the frontend in your default browser. It connects to the API at
+`http://127.0.0.1:8000`.
 
-## API Documentation
+## 🔌 API
 
-Open:
+Interactive API reference: [`http://127.0.0.1:8000/docs`](http://127.0.0.1:8000/docs)
 
-http://127.0.0.1:8000/docs
-
-## Endpoints
-
-| Method | Endpoint | Description |
+| Method | Endpoint | Purpose |
 |---|---|---|
-| GET | / | API information |
-| GET | /health | Health check |
-| POST | /predict | Predict image class |
+| `GET` | `/` | API information |
+| `GET` | `/health` | API and model loading status |
+| `POST` | `/predict` | Predict an image |
 
-`POST /predict` accepts a multipart image field named `file` and an optional
-`model_name` query parameter (`smaug` by default, or `efficientnet`). JPG/JPEG
-and PNG files up to 10 MB are supported.
+`POST /predict` accepts a multipart `file` and an optional `model_name`
+parameter. Choose `smaug` (default) or `efficientnet`.
 
-## Prediction Response
+Example request:
+
+```bash
+curl -X POST "http://127.0.0.1:8000/predict?model_name=smaug" -F "file=@sample.jpg"
+```
+
+Example response:
 
 ```json
 {
@@ -136,21 +122,30 @@ and PNG files up to 10 MB are supported.
 }
 ```
 
-The values are illustrative, not an actual prediction.
+The response values above are illustrative, not an actual prediction.
 
-## Backend Logs
+## 🗂️ Project layout
 
-The backend uses Python's standard logging and writes logs to the backend
-process output. Logs include application and model startup/shutdown, prediction
-requests and results, and rejected uploads. Uploaded image contents and
-filenames are not included in these application log messages. When running
-locally, check the terminal running Uvicorn for these logs.
+```text
+deep_fake_image_detection/
+├── app/                 # FastAPI app, model loading, and prediction
+├── frontend/            # React + Vite user interface
+├── models/              # EfficientNet weights and cached Smaug files
+├── tests/               # API tests
+├── requirements.txt
+└── README.md
+```
 
-## Limitations
+## 📝 Logs
 
-The model was trained on CIFAKE. Performance on unseen
-AI image generators, edited images and real-world images
-must be evaluated separately.
+Backend logs are written to the terminal running Uvicorn. They include
+application and model startup/shutdown, prediction requests and results, and
+rejected uploads. Application log messages do not include image contents or
+uploaded filenames.
 
-Detector confidence scores are not calibrated probabilities and
-should not be interpreted as proof of authenticity.
+## ⚠️ Limitations
+
+- Performance on unseen AI generators, edited images, and real-world images
+  must be evaluated separately.
+- Detector confidence scores are not calibrated probabilities and should not
+  be interpreted as proof of authenticity.
